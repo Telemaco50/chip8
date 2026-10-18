@@ -1,0 +1,13 @@
+# Carpeta de compilación de CMake (incluye SDL descargado)
+build/
+out/
+
+# Configuración local de VS Code / Visual Studio
+.vs/
+.vscode/
+
+# Binarios
+*.exe
+*.obj
+*.pdb
+*.ilk
