@@ -5,6 +5,8 @@
 #include <cstdint>
 
 #include <iostream>
+#include "logger.h"
+#include "romLoader.h"
 
 #define NUM_KEYS 16
 #define  TOTAL_RAM 4096
@@ -65,8 +67,10 @@ class TChip8
     bool m_emulatorRunning;
 
     //Logging
-    // std::shared_ptr<Tlogger> m_logger;
+    std::shared_ptr<TLogger> m_logger;
 
+    //Cargar Rom
+    TRomLoader* m_loader;
 
 public:
     TChip8();

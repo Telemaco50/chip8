@@ -33,11 +33,18 @@ void TChip8::init(std::string rom_path)
     m_delay_timer =0;
     m_sound_timer=0;
 
+
+
     //Inicializa el teclado con todo sin pulsar
 
     for(auto i=0; i< NUM_KEYS;i++)
         m_keys[i]=0;
         m_key_pressed=false;
+
+
+    m_loader=new TRomLoader();
+    m_loader->loadRom(rom_path,m_ram+PROGRAM_START_ADDR);
+    delete m_loader;
 }
 
 void TChip8::run()
