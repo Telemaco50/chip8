@@ -13,5 +13,13 @@ FetchContent_Declare(SDL3
   GIT_SHALLOW    TRUE)
 FetchContent_MakeAvailable(SDL3)
 
-add_executable(chip8 src/main.cpp src/Chip8.cpp src/Platform.cpp)
+# Cada .cpp nuevo del proyecto se añade a esta lista
+add_executable(chip8
+  src/main.cpp
+  src/Chip8.cpp
+  src/Platform.cpp
+  src/logger.cpp
+  src/cmdLineParser.cpp
+  src/romLoader.cpp
+)
 target_link_libraries(chip8 PRIVATE SDL3::SDL3)
