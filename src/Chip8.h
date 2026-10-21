@@ -49,6 +49,8 @@ class TChip8
 {
     friend class  TCpu;
 
+    TCpu* m_cpu;
+    
     //Pantalla
     uint8_t m_screen[SCREEN_HEIGHT][SCREEN_WIDTH];
     //Teclado
