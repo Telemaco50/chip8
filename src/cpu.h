@@ -14,7 +14,7 @@
 class TCpu
 {
     //Registers
-    uint8_t m_reg[NUM_V_REGISTERS];
+    uint8_t m_reg[NUM_V_REGISTERS]{};
     uint16_t m_ireg;
     uint16_t m_pcreg;
     uint16_t m_sp_reg;
