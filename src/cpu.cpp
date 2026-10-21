@@ -9,7 +9,12 @@ TCpu::TCpu (TChip8* machine)
 {
     m_machine=machine;
     m_logger = TLogger::getInstance();
-
+    m_pcreg=PC_START;
+    m_current_op=0;
+    m_sp_reg=0;
+    m_ireg=0;
+    m_instruction =0;
+    m_reg;
 }
 
 TCpu::~TCpu()
@@ -26,6 +31,7 @@ void TCpu::init()
     m_sp_reg=0;
     m_ireg=0;
     m_instruction =0;
+    m_reg;
 
     for(auto i=0; i<NUM_V_REGISTERS;i++)
         m_reg[i]=0;
