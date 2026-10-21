@@ -1,6 +1,7 @@
 #include <cctype>
 
 #include "cmdLineParser.h"
+#include <string>
 
 // Private functions
 void TCmdLineParser::printHelpMessage()

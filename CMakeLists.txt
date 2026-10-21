@@ -21,5 +21,8 @@ add_executable(chip8
   src/logger.cpp
   src/cmdLineParser.cpp
   src/romLoader.cpp
+  src/cpu.h
+  src/cpu.cpp
+  src/displaysdl.cpp
 )
 target_link_libraries(chip8 PRIVATE SDL3::SDL3)
