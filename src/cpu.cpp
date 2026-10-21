@@ -14,7 +14,7 @@ TCpu::TCpu (TChip8* machine)
     m_sp_reg=0;
     m_ireg=0;
     m_instruction =0;
-    m_reg;
+    // m_reg;
 }
 
 TCpu::~TCpu()
@@ -31,7 +31,7 @@ void TCpu::init()
     m_sp_reg=0;
     m_ireg=0;
     m_instruction =0;
-    m_reg;
+    // m_reg;
 
     for(auto i=0; i<NUM_V_REGISTERS;i++)
         m_reg[i]=0;
