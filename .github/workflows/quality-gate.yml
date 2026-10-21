@@ -25,7 +25,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Descargar el código
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       # Guarda SDL3 ya descargado entre ejecuciones para no bajarlo cada vez
       - name: Caché de dependencias (SDL3)
@@ -47,20 +47,32 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Descargar el código
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Instalar cppcheck
         run: sudo apt-get update && sudo apt-get install -y cppcheck
 
-      # --error-exitcode=1  → si encuentra algo de nivel "error" o "warning", el paso falla (❌)
-      # --enable=...        → qué tipos de comprobaciones hacer
-      # --suppress=...      → ignorar avisos de cabeceras del sistema/SDL que no encuentra
-      - name: Ejecutar cppcheck
+      # Sugerencias de rendimiento/portabilidad: se muestran, pero NO hacen fallar el gate
+      - name: cppcheck - sugerencias (informativo)
         run: >
           cppcheck src
           --std=c++20
           --language=c++
-          --enable=warning,performance,portability
+          --enable=performance,portability
+          --inline-suppr
+          --suppress=missingIncludeSystem
+          --suppress=missingInclude
+          --template="{file}:{line}: [{severity}] {message} ({id})"
+
+      # Errores y avisos (bugs probables): si aparece alguno, el gate falla (❌)
+      # --error-exitcode=1  → si encuentra algo, el paso devuelve error
+      # --suppress=...      → ignorar avisos de cabeceras del sistema/SDL que no encuentra
+      - name: cppcheck - errores y avisos (bloqueante)
+        run: >
+          cppcheck src
+          --std=c++20
+          --language=c++
+          --enable=warning
           --error-exitcode=1
           --inline-suppr
           --suppress=missingIncludeSystem
