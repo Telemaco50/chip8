@@ -1,6 +1,8 @@
 #include "chip8.h"
 #include "cmdLineParser.h"
 #include "logger.h"
+#include "displaysdl.h"
+#include "keyboardsdl.h"
 
 int main(int argc, char** argv)
 {
@@ -27,11 +29,16 @@ int main(int argc, char** argv)
         logger->log("No rom path provided", ELogLevel::ERROR);
         exit(1);
     }
-    
+    TDisplaySDL display;
+    TKeyboardSDL keyboard;
     TChip8 emulator;    
+    emulator.setDisplay(&display);
+    emulator.setKeyboard(&keyboard);
     emulator.init(cmdParser.getRomFileName());
     emulator.run();
     emulator.deinit();
 
+    
+    
     return 0;
 }

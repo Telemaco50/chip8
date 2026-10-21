@@ -82,23 +82,8 @@ void TDisplaySDL::update()
     // Mostrar en la ventana lo que se ha dibujado en draw()
     SDL_RenderPresent(m_renderer);
 
-    // Procesar TODOS los eventos pendientes (while, no if: puede haber varios por frame).
-    // Si no se procesan, Windows marca la ventana como "No responde".
-    //
-    // TODO paso 13 (teclado): mover este bucle de eventos a TKeyboardSDL::update().
-    // Los eventos solo deben leerse en UN sitio; si se leen aquí también,
-    // este bucle se "come" las pulsaciones de teclado y el teclado nunca las verá.
-    SDL_Event e;
-    while (SDL_PollEvent(&e))
-    {
-        if (e.type == SDL_EVENT_QUIT)
-        {
-            // Temporal hasta el paso 13: cerrar el programa al pulsar la X
-            m_logger->log("Cerrando emulador", ELogLevel::INFO);
-            deinit();
-            exit(0);
-        }
-    }
+    // Aquí NO se leen eventos: de eso se encarga TKeyboardSDL::update(),
+    // que es el único sitio del programa que llama a SDL_PollEvent.
 }
 
 void TDisplaySDL::deinit()
