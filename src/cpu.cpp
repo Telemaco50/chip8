@@ -95,8 +95,6 @@ void TCpu::deinit()
     };
     // 8XY?  → mira el último dígito (8XY0 ... 8XYE)
     void TCpu::decodifica_instruccion_8(){
-             switch(m_current_op & 0xF)
-    {
          switch (m_current_op & 0x000F)   // último dígito: el "?" de 8XY?
     {
         case 0x0: ajusta_VX_a_VY();          break;   // 8XY0
@@ -112,7 +110,6 @@ void TCpu::deinit()
             m_logger->log("Instruccion 8 con codigo desconocido: " + std::to_string(m_current_op & 0xF),
                           ELogLevel::ERROR);
             break;
-    }
     }
 
     };
@@ -257,24 +254,22 @@ void TCpu::deinit()
          uint8_t reg_x = (m_current_op >> 8) & 0x0F;
         uint8_t reg_y = (m_current_op >> 4) & 0x0F;
         uint16_t add = m_reg[reg_x] + m_reg[reg_y];
-                if(add > 0xFF)
-            m_reg[0xF] = 1;
-        else
-            m_reg[0xF] = 0;
 
+        // Primero el resultado, VF al final (por si X es F)
         m_reg[reg_x] = add & 0xFF;
+        m_reg[0xF] = (add > 0xFF) ? 1 : 0;
     };
     // 8XY5
     void TCpu::resta_VY_a_VX(){
          uint8_t reg_x = (m_current_op >> 8) & 0x0F;
         uint8_t reg_y = (m_current_op >> 4) & 0x0F;
         
-        if(m_reg[reg_x] > m_reg[reg_y])
-            m_reg[0xF] = 1;
-        else
-            m_reg[0xF] = 0;
-
+        // 1. calcular la bandera (>=: si son iguales NO hay préstamo)
+        uint8_t flag = (m_reg[reg_x] >= m_reg[reg_y]) ? 1 : 0;
+        // 2. operar
         m_reg[reg_x] -= m_reg[reg_y];
+        // 3. VF al final
+        m_reg[0xF] = flag;
 
 
     };
@@ -283,24 +278,19 @@ void TCpu::deinit()
 
          uint8_t reg = (m_current_op >> 8) & 0x0F;
 
-            if(m_reg[reg] % 2 == 1 )
-                m_reg[0xF] = 1;
-            else
-                m_reg[0xF] = 0;
-
+            // El bit que se "cae" por la derecha
+            uint8_t flag = m_reg[reg] & 0x01;
             m_reg[reg] >>= 1;
+            m_reg[0xF] = flag;
     };
     // 8XY7
     void TCpu::ajusta_VX_a_VY_menos_VX(){
         uint8_t reg_x = (m_current_op >> 8) & 0x0F;
         uint8_t reg_y = (m_current_op >> 4) & 0x0F;
 
-        if(m_reg[reg_y] > m_reg[reg_x])
-            m_reg[0xF] = 1;
-        else
-            m_reg[0xF] = 0;
-
+        uint8_t flag = (m_reg[reg_y] >= m_reg[reg_x]) ? 1 : 0;
         m_reg[reg_x] = m_reg[reg_y] - m_reg[reg_x];
+        m_reg[0xF] = flag;
 
     };
     // 8XYE
@@ -308,12 +298,10 @@ void TCpu::deinit()
 
          uint8_t reg = (m_current_op >> 8) & 0x0F;
 
-            if(m_reg[reg] % 0x80 == 1 )
-                m_reg[0xF] = 1;
-            else
-                m_reg[0xF] = 0;
-
+            // El bit que se "cae" por la izquierda: máscara 0x80 y bajarlo con >> 7 → 0 o 1
+            uint8_t flag = (m_reg[reg] & 0x80) >> 7;
             m_reg[reg] <<= 1;
+            m_reg[0xF] = flag;
 
     };
     // 9XY0
