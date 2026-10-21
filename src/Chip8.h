@@ -3,8 +3,13 @@
 #define __CHIP8_H__
 
 #include <cstdint>
-
+#include <memory>    
 #include <iostream>
+#include "logger.h"
+#include "romLoader.h"
+#include "display.h"
+#include "keyboard.h"
+
 
 #define NUM_KEYS 16
 #define  TOTAL_RAM 4096
@@ -47,6 +52,8 @@ class TChip8
 {
     friend class  TCpu;
 
+    std::unique_ptr<TCpu> m_cpu; 
+
     //Pantalla
     uint8_t m_screen[SCREEN_HEIGHT][SCREEN_WIDTH];
     //Teclado
@@ -65,8 +72,17 @@ class TChip8
     bool m_emulatorRunning;
 
     //Logging
-    // std::shared_ptr<Tlogger> m_logger;
+    std::shared_ptr<TLogger> m_logger;
 
+    //Cargar Rom
+    TRomLoader* m_loader;
+
+    //Cargar Display
+    TDisplay* m_display;
+
+    //Cargar teclado
+
+    TKeyboard* m_keyboard;
 
 public:
     TChip8();
@@ -75,6 +91,11 @@ public:
     void init(std::string rom_path);
     void run();
     void deinit();
+
+    void setDisplay(TDisplay* display);
+
+    void setKeyboard(TKeyboard* keyboard);
+    
 };
 
 #endif
