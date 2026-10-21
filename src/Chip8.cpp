@@ -6,10 +6,11 @@
 #include "cpu.h"
 #include "logger.h"
 #include <chrono>
+
 TChip8::TChip8()
 {
     m_logger= TLogger::getInstance();
-    m_cpu= new TCpu(this);
+    m_cpu = std::make_unique<TCpu>(this);  
     m_emulatorRunning=true;
     m_display=nullptr;
     m_keyboard=nullptr;

@@ -3,7 +3,7 @@
 #define __CHIP8_H__
 
 #include <cstdint>
-
+#include <memory>    
 #include <iostream>
 #include "logger.h"
 #include "romLoader.h"
@@ -52,7 +52,7 @@ class TChip8
 {
     friend class  TCpu;
 
-    TCpu* m_cpu;
+    std::unique_ptr<TCpu> m_cpu; 
 
     //Pantalla
     uint8_t m_screen[SCREEN_HEIGHT][SCREEN_WIDTH];
