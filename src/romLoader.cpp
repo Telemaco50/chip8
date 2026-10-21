@@ -22,7 +22,7 @@ void TRomLoader::loadRom(std::string& file_path, uint8_t* mem){
 
     if (!file)
     {
-        m_logger->log("No se puede abrir esta vaina" +file_path, ELogLevel::ERROR);
+        m_logger->log("No se puede abrir esta vaina " +file_path, ELogLevel::ERROR);
         exit(1);
 
     }

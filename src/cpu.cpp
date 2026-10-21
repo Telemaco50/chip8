@@ -52,22 +52,23 @@ void TCpu::execute()
     
     switch(m_instruction)
     {
-        case 0x0:
-        case 0x1: 
-        case 0x2:
-        case 0x3:
-        case 0x4:
-        case 0x5:
-        case 0x6:
-        case 0x7:
-        case 0x8:
-        case 0x9:
-        case 0xA:
-        case 0xB:
-        case 0xC:
-        case 0xD:
-        case 0xE:
-        case 0xF: m_logger->log("INSTRUCTION OPCODE NO IMPLEMENTADA CHACHO!!!", ELogLevel::ERROR); exit(1); break;
+        case 0x0: decodifica_instruccion_0();break;
+        case 0x1: salta_a_direccion();break;
+        case 0x2: llama_subrutina_NNN(); break;
+        case 0x3: saltar_instruccion_VX_igual_NN();break;
+        case 0x4: saltar_instruccion_VX_no_igual_NN();break;
+        case 0x5: saltar_instruccion_VX_igual_VY();break;
+        case 0x6: ajusta_VX_a_NN();break;
+        case 0x7: anade_NN_a_VX();break;
+        case 0x8:decodifica_instruccion_8();break;
+        case 0x9:saltar_instruccion_si_VX_no_igual_VY();break;
+        case 0xA:ajusta_I_a_NNN();break;
+        case 0xB:salta_a_direccion_NNN_mas_V0();break;
+        case 0xC:ajusta_VX_num_aleatorio();break;
+        case 0xD:dibuja_sprite();break;
+        case 0xE:decodifica_instruccion_E();break;
+        case 0xF: decodifica_instruccion_F();break;
+        default: m_logger->log("INSTRUCTION OPCODE NO IMPLEMENTADA CHACHO!!!", ELogLevel::ERROR); exit(1); break;
 	}
 }
 
@@ -350,22 +351,37 @@ void TCpu::deinit()
     uint8_t v_reg_x = (m_current_op & 0x0F00) >> 8;
     uint8_t v_reg_y = (m_current_op & 0x00F0) >> 4;   
     uint8_t sprite_height = m_current_op & 0x000F;
-    uint8_t x_location = m_reg[v_reg_x];
-    uint8_t y_location = m_reg[v_reg_y];
+    // 1. ENVOLVER la coordenada inicial: si el juego pide x=70, se empieza en x=6
+    uint8_t x_location = m_reg[v_reg_x] % SCREEN_WIDTH;
+    uint8_t y_location = m_reg[v_reg_y] % SCREEN_HEIGHT;
 
     // Reset colision register
     m_reg[0xF] = 0;
     for(int y_coordinate = 0; y_coordinate < sprite_height; y_coordinate++)
     {
+        int y = y_location + y_coordinate;
+
+        // 2. RECORTAR por abajo: esta fila (y las siguientes) caen fuera de la pantalla.
+        //    Sin esto se escribiría en m_screen[32], [33]... que es la memoria de
+        //    m_keys y m_ram (¡la fuente!) que hay justo detrás en TChip8.
+        if(y >= SCREEN_HEIGHT)
+            break;
+
         uint8_t pixel = m_machine->m_ram[m_ireg + y_coordinate];
         for(int x_coordinate = 0; x_coordinate < 8; x_coordinate++)
         {
+            int x = x_location + x_coordinate;
+
+            // 3. RECORTAR por la derecha: el resto de esta fila cae fuera de la pantalla
+            if(x >= SCREEN_WIDTH)
+                break;
+
             if((pixel & (0x80 >> x_coordinate)) != 0)
-            { 
-                if(m_machine->m_screen[y_location + y_coordinate][x_location + x_coordinate] == 1)
+            {
+                if(m_machine->m_screen[y][x] == 1)
                     m_reg[0xF] = 1;
-                
-                m_machine->m_screen[y_location + y_coordinate][x_location + x_coordinate] ^= 0x1;
+
+                m_machine->m_screen[y][x] ^= 0x1;
             }
         }
     }
@@ -440,10 +456,10 @@ void TCpu::deinit()
     // FX33  centenas, decenas y unidades de VX en I, I+1, I+2
     void TCpu::guardar_BCD_VX(){
         uint8_t reg = (m_current_op >> 8) & 0x0F;
-
+      
         m_machine->m_ram[m_ireg] = m_reg[reg] / 100;
         m_machine->m_ram[m_ireg+1] = (m_reg[reg] / 10) % 10;
-        m_machine->m_ram[m_ireg+1] = (m_reg[reg] % 100) % 10;
+        m_machine->m_ram[m_ireg+2] = (m_reg[reg] % 100) % 10;
 
     };
     // FX55

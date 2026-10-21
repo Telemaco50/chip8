@@ -24,5 +24,8 @@ add_executable(chip8
   src/cpu.h
   src/cpu.cpp
   src/displaysdl.cpp
+  src/keyboard.h
+  src/keyboardsdl.h
+  src/keyboardsdl.cpp
 )
 target_link_libraries(chip8 PRIVATE SDL3::SDL3)
