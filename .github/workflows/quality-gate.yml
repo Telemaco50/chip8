@@ -1,0 +1,68 @@
+# Quality gate del emulador CHIP-8
+#
+# Se ejecuta:
+#   - en cada push a "desarrollo" (aviso temprano mientras trabajas)
+#   - en cada pull request hacia "calidad" o "master" (el gate de verdad)
+#   - a mano, desde la pestaña Actions de GitHub (workflow_dispatch)
+#
+# Si algún paso falla, el check sale en rojo ❌ en el pull request.
+# (En un repo privado con GitHub Free no se puede BLOQUEAR el merge,
+#  así que la regla la pones tú: no se fusiona nada en rojo).
+
+name: Quality gate
+
+on:
+  push:
+    branches: [desarrollo]
+  pull_request:
+    branches: [calidad, master]
+  workflow_dispatch:
+
+jobs:
+  # 1. ¿Compila? Con el mismo compilador que usas en local (MSVC en Windows)
+  compilar:
+    name: Compilar (Windows / MSVC)
+    runs-on: windows-latest
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v4
+
+      # Guarda SDL3 ya descargado entre ejecuciones para no bajarlo cada vez
+      - name: Caché de dependencias (SDL3)
+        uses: actions/cache@v4
+        with:
+          path: build/_deps
+          key: deps-${{ runner.os }}-${{ hashFiles('CMakeLists.txt') }}
+
+      - name: Configurar con CMake
+        run: cmake -S . -B build
+
+      - name: Compilar
+        run: cmake --build build --config Debug --target chip8
+
+  # 2. Análisis estático: busca bugs típicos de C++ sin ejecutar el programa
+  #    (accesos fuera de un array, variables sin inicializar, fugas de memoria...)
+  analisis:
+    name: Análisis estático (cppcheck)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v4
+
+      - name: Instalar cppcheck
+        run: sudo apt-get update && sudo apt-get install -y cppcheck
+
+      # --error-exitcode=1  → si encuentra algo de nivel "error" o "warning", el paso falla (❌)
+      # --enable=...        → qué tipos de comprobaciones hacer
+      # --suppress=...      → ignorar avisos de cabeceras del sistema/SDL que no encuentra
+      - name: Ejecutar cppcheck
+        run: >
+          cppcheck src
+          --std=c++20
+          --language=c++
+          --enable=warning,performance,portability
+          --error-exitcode=1
+          --inline-suppr
+          --suppress=missingIncludeSystem
+          --suppress=missingInclude
+          --template="{file}:{line}: [{severity}] {message} ({id})"

@@ -82,16 +82,21 @@ void TChip8::run()
             m_display->draw(m_screen, SCREEN_WIDTH,SCREEN_HEIGHT);
             m_display->update();
             m_keyboard->update(m_keys, &m_emulatorRunning);
+            if(display_update_delay_time >= 20)
+                    {
+                        display_update_delay_time = 0;
+                        m_display->draw(m_screen, SCREEN_WIDTH, SCREEN_HEIGHT);
+                        m_display->update();
+                    
+                        // Update timers ~60Hz
+                        if(m_delay_timer > 0)
+                            m_delay_timer--;
 
-            if(m_delay_timer> 0)
-                m_delay_timer--;
+                        if(m_sound_timer > 0)
+                            m_sound_timer--;
+                    }
 
-            if(m_sound_timer> 0)
-                m_sound_timer--;
-
-        }
-
-        end= clock::now();
+                     end= clock::now();
 
         std::chrono::duration<double, std::micro> loop_time = end - start;
         //Calcular el tiempo que ha pasado en millsecs
@@ -104,6 +109,9 @@ void TChip8::run()
         }
         display_update_delay_time++;
 
+        }
+
+       
 
 }
 
