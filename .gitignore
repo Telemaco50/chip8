@@ -12,3 +12,4 @@ out/
 *.pdb
 *.ilk
 *.md
+!README.md
