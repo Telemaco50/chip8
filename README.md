@@ -1,6 +1,6 @@
 # Emulador CHIP-8 en C++
 
-Emulador de [CHIP-8](https://es.wikipedia.org/wiki/CHIP-8) escrito en C++20 con SDL3.
+Emulador de [CHIP-8](https://es.wikipedia.org/wiki/CHIP-8) escrito en C++ con SDL3.
 
 Es un **proyecto personal de aprendizaje**: mi primer proyecto serio en C++, viniendo del mundo
 de los datos (SQL, Python, Java). Lo usé para aprender cómo funciona un ordenador por dentro
