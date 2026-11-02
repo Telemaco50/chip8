@@ -27,20 +27,17 @@ class TCpu
     TChip8* m_machine;
 
 
-    //DECODIFICADORES DE GRUPO
-    // Para estos grupos el primer dígito no basta: miran el resto del opcode
-    // y llaman a la instrucción concreta (un segundo switch).
-    // 0???  → mira el último byte   (00E0, 00EE)
+    //Decodificadores de grupo
+    // 00E0, 00EE
     void decodifica_instruccion_0();
-    // 8XY?  → mira el último dígito (8XY0 ... 8XYE)
+    // 8XY0 - 8XYE
     void decodifica_instruccion_8();
-    // EX??  → mira el último byte   (EX9E, EXA1)
+    // EX9E, EXA1
     void decodifica_instruccion_E();
-    // FX??  → mira el último byte   (FX07 ... FX65)
+    // FX07 - FX65
     void decodifica_instruccion_F();
 
     //INSTRUCCIONES AQUI
-    // Notación: NNN = 12 bits (dirección), NN = 8 bits (valor), N = 4 bits
     // 00E0
     void limpiar_pantalla();
     // 00EE
@@ -93,7 +90,7 @@ class TCpu
     void saltar_instruccion_si_tecla_no_pulsada_almacenada_VX();
     // FX07  VX = temporizador de retardo
     void carga_VX_con_retardo();
-    // FX0A  espera (bloquea) hasta que se pulse una tecla y la guarda en VX
+    // FX0A  espera una tecla y la guarda en VX
     void espera_tecla();
     // FX15  temporizador de retardo = VX
     void ajusta_temporizador_retardo();
@@ -103,7 +100,7 @@ class TCpu
     void anade_VX_a_I();
     // FX29
     void ajusta_I_a_posicion_VX();
-    // FX33  centenas, decenas y unidades de VX en I, I+1, I+2
+    // FX33  BCD de VX en I, I+1, I+2
     void guardar_BCD_VX();
     // FX55
     void guardar_desde_V0_a_VX();

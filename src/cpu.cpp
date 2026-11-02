@@ -86,10 +86,8 @@ void TCpu::deinit()
 //funciones privadas
 
 
-  //DECODIFICADORES DE GRUPO
-    // Para estos grupos el primer dígito no basta: miran el resto del opcode
-    // y llaman a la instrucción concreta (un segundo switch).
-    // 0???  → mira el último byte   (00E0, 00EE)
+  //Decodificadores de grupo
+    // 00E0, 00EE
     void TCpu::decodifica_instruccion_0()
     {
          switch(m_current_op & 0xFF)
@@ -99,9 +97,9 @@ void TCpu::deinit()
         default: m_logger->log("Instruction 0 with code " + std::to_string(m_current_op & 0xFF), ELogLevel::ERROR);
     }
     };
-    // 8XY?  → mira el último dígito (8XY0 ... 8XYE)
+    // 8XY0 - 8XYE
     void TCpu::decodifica_instruccion_8(){
-         switch (m_current_op & 0x000F)   // último dígito: el "?" de 8XY?
+         switch (m_current_op & 0x000F)
     {
         case 0x0: ajusta_VX_a_VY();          break;   // 8XY0
         case 0x1: ajusta_VX_a_VX_o_VY();     break;   // 8XY1
@@ -119,7 +117,7 @@ void TCpu::deinit()
     }
 
     };
-    // EX??  → mira el último byte   (EX9E, EXA1)
+    // EX9E, EXA1
     void TCpu::decodifica_instruccion_E(){
         switch(m_current_op & 0xFF)
     {
@@ -128,7 +126,7 @@ void TCpu::deinit()
         default: m_logger->log("Instruction E with code " + std::to_string(m_current_op & 0xFF), ELogLevel::ERROR);
     }
     };
-    // FX??  → mira el último byte   (FX07 ... FX65)
+    // FX07 - FX65
     void TCpu::decodifica_instruccion_F(){
           switch(m_current_op & 0xFF)
     {
@@ -146,7 +144,6 @@ void TCpu::deinit()
     };
 
     //INSTRUCCIONES AQUI
-    // Notación: NNN = 12 bits (dirección), NN = 8 bits (valor), N = 4 bits
     // 00E0
     void TCpu::limpiar_pantalla(){
 
@@ -261,7 +258,7 @@ void TCpu::deinit()
         uint8_t reg_y = (m_current_op >> 4) & 0x0F;
         uint16_t add = m_reg[reg_x] + m_reg[reg_y];
 
-        // Primero el resultado, VF al final (por si X es F)
+        // VF al final por si X es F
         m_reg[reg_x] = add & 0xFF;
         m_reg[0xF] = (add > 0xFF) ? 1 : 0;
     };
@@ -270,11 +267,8 @@ void TCpu::deinit()
          uint8_t reg_x = (m_current_op >> 8) & 0x0F;
         uint8_t reg_y = (m_current_op >> 4) & 0x0F;
         
-        // 1. calcular la bandera (>=: si son iguales NO hay préstamo)
-        uint8_t flag = (m_reg[reg_x] >= m_reg[reg_y]) ? 1 : 0;
-        // 2. operar
+        uint8_t flag = (m_reg[reg_x] >= m_reg[reg_y]) ? 1 : 0;   // sin préstamo
         m_reg[reg_x] -= m_reg[reg_y];
-        // 3. VF al final
         m_reg[0xF] = flag;
 
 
@@ -284,7 +278,6 @@ void TCpu::deinit()
 
          uint8_t reg = (m_current_op >> 8) & 0x0F;
 
-            // El bit que se "cae" por la derecha
             uint8_t flag = m_reg[reg] & 0x01;
             m_reg[reg] >>= 1;
             m_reg[0xF] = flag;
@@ -304,7 +297,6 @@ void TCpu::deinit()
 
          uint8_t reg = (m_current_op >> 8) & 0x0F;
 
-            // El bit que se "cae" por la izquierda: máscara 0x80 y bajarlo con >> 7 → 0 o 1
             uint8_t flag = (m_reg[reg] & 0x80) >> 7;
             m_reg[reg] <<= 1;
             m_reg[0xF] = flag;
@@ -345,7 +337,7 @@ void TCpu::deinit()
     uint8_t v_reg_x = (m_current_op & 0x0F00) >> 8;
     uint8_t v_reg_y = (m_current_op & 0x00F0) >> 4;   
     uint8_t sprite_height = m_current_op & 0x000F;
-    // 1. ENVOLVER la coordenada inicial: si el juego pide x=70, se empieza en x=6
+    // La posición inicial se envuelve
     uint8_t x_location = m_reg[v_reg_x] % SCREEN_WIDTH;
     uint8_t y_location = m_reg[v_reg_y] % SCREEN_HEIGHT;
 
@@ -355,9 +347,7 @@ void TCpu::deinit()
     {
         int y = y_location + y_coordinate;
 
-        // 2. RECORTAR por abajo: esta fila (y las siguientes) caen fuera de la pantalla.
-        //    Sin esto se escribiría en m_screen[32], [33]... que es la memoria de
-        //    m_keys y m_ram (¡la fuente!) que hay justo detrás en TChip8.
+        // Recortar por abajo
         if(y >= SCREEN_HEIGHT)
             break;
 
@@ -366,7 +356,7 @@ void TCpu::deinit()
         {
             int x = x_location + x_coordinate;
 
-            // 3. RECORTAR por la derecha: el resto de esta fila cae fuera de la pantalla
+            // Recortar por la derecha
             if(x >= SCREEN_WIDTH)
                 break;
 
@@ -405,7 +395,7 @@ void TCpu::deinit()
             m_reg[reg] = m_machine->m_delay_timer;
 
     };
-    // FX0A  espera (bloquea) hasta que se pulse una tecla y la guarda en VX
+    // FX0A  espera una tecla y la guarda en VX
     void TCpu::espera_tecla(){
          uint8_t reg = (m_current_op >> 8) & 0x0F;
     bool key_pressed = false;
@@ -447,7 +437,7 @@ void TCpu::deinit()
         uint8_t reg = (m_current_op >> 8) & 0x0F;
     m_ireg = m_reg[reg] * 0x5;
     };
-    // FX33  centenas, decenas y unidades de VX en I, I+1, I+2
+    // FX33  BCD de VX en I, I+1, I+2
     void TCpu::guardar_BCD_VX(){
         uint8_t reg = (m_current_op >> 8) & 0x0F;
       

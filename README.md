@@ -1,13 +1,21 @@
 # Emulador CHIP-8 en C++
 
-Emulador de [CHIP-8](https://es.wikipedia.org/wiki/CHIP-8) escrito en C++20 con SDL3, hecho como
-proyecto personal para aprender C++: memoria, operaciones con bits, punteros, clases, herencia
-e interfaces.
+Emulador de [CHIP-8](https://es.wikipedia.org/wiki/CHIP-8) escrito en C++20 con SDL3.
 
-## Tutorial seguido
+Es un **proyecto personal de aprendizaje**: mi primer proyecto serio en C++, viniendo del mundo
+de los datos (SQL, Python, Java). Lo usé para aprender cómo funciona un ordenador por dentro
+(memoria, registros, ciclo fetch-decode-execute) y los fundamentos del lenguaje: operaciones con
+bits, punteros y referencias, clases, herencia e interfaces, y gestión de memoria.
 
-El proyecto sigue la estructura del tutorial de TMVTech
-**[CHIP-8 Emulator in C++](https://www.tmvtech.com/chip8-emulator-in-cpp/)**, adaptado a:
+## Cómo lo he hecho
+
+- **Tutorial:** he seguido la estructura del tutorial de TMVTech
+  **[CHIP-8 Emulator in C++](https://www.tmvtech.com/chip8-emulator-in-cpp/)**, escribiendo y
+  entendiendo el código paso a paso.
+- **Apoyo de IA:** he usado una IA como profesor: para resolver dudas de C++, revisar mi código,
+  depurar los fallos y montar el entorno (CMake, SDL3 y GitHub Actions).
+
+El tutorial está pensado para Linux con SDL2, así que lo he adaptado a:
 
 | Tutorial | Este proyecto |
 |---|---|
