@@ -13,7 +13,6 @@ FetchContent_Declare(SDL3
   GIT_SHALLOW    TRUE)
 FetchContent_MakeAvailable(SDL3)
 
-# Cada .cpp nuevo del proyecto se añade a esta lista
 add_executable(chip8
   src/main.cpp
   src/Chip8.cpp
