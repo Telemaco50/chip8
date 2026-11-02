@@ -3,9 +3,7 @@
 
 #include "keyboardsdl.h"
 
-// Traduce una tecla del PC a la tecla del CHIP-8 (0x0-0xF).
-// Devuelve -1 si la tecla no pertenece al teclado del CHIP-8.
-//
+// Tecla del PC a tecla del CHIP-8 (0x0-0xF), o -1 si no pertenece al teclado
 //   CHIP-8        PC
 //   1 2 3 C       1 2 3 4
 //   4 5 6 D       Q W E R
@@ -19,7 +17,7 @@ static int traducirTecla(SDL_Keycode tecla)
         case SDLK_2: return 0x2;
         case SDLK_3: return 0x3;
         case SDLK_4: return 0xC;
-        case SDLK_Q: return 0x4;   // en SDL3 las letras van en mayúscula: SDLK_Q (en SDL2 era SDLK_q)
+        case SDLK_Q: return 0x4;
         case SDLK_W: return 0x5;
         case SDLK_E: return 0x6;
         case SDLK_R: return 0xD;
@@ -52,8 +50,6 @@ void TKeyboardSDL::init()
 
 void TKeyboardSDL::update(uint8_t* key_map, bool* running)
 {
-    // Procesar TODOS los eventos pendientes (while, no if).
-    // Este debe ser el ÚNICO sitio del programa que llama a SDL_PollEvent.
     SDL_Event e;
     while (SDL_PollEvent(&e))
     {
@@ -69,16 +65,15 @@ void TKeyboardSDL::update(uint8_t* key_map, bool* running)
                     break;
                 }
 
-                int tecla = traducirTecla(e.key.key);   // en SDL3: e.key.key (en SDL2: e.key.keysym.sym)
+                int tecla = traducirTecla(e.key.key);
                 if (tecla != -1)
                 {
-                    // Pulsada = 1, soltada = 0
                     key_map[tecla] = (e.type == SDL_EVENT_KEY_DOWN) ? 1 : 0;
                 }
                 break;
             }
 
-            case SDL_EVENT_QUIT:   // clic en la X de la ventana
+            case SDL_EVENT_QUIT:
                 *running = false;
                 break;
 
